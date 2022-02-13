@@ -1,5 +1,4 @@
 using System;
-using Azure.AI.TextAnalytics;
 
 namespace Serverless.Openhack
 {

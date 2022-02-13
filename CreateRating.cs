@@ -7,6 +7,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Net.Http;
 
 namespace Serverless.Openhack
 {
@@ -18,26 +19,61 @@ namespace Serverless.Openhack
             [CosmosDB(
                 databaseName: "ch03db",
                 collectionName: "ch03collection",
-                ConnectionStringSetting = "CosmosDBConnection"
+                ConnectionStringSetting = "CosmosDBConnectionString"
             )] IAsyncCollector<Rating> ratingsOut,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            string name = req.Query["name"];
-
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
+            Rating rating = JsonConvert.DeserializeObject<Rating>(requestBody);    
 
-            log.LogInformation( "Received: {data}" );
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri("https://serverlessohproduct.trafficmanager.net");
+                    var result = await client.GetAsync($"/api/GetProduct?productId={rating.productId}");
+                    string resultBody = await result.Content.ReadAsStringAsync();
+                    Product product = JsonConvert.DeserializeObject<Product>(resultBody);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Could not find product with id: {rating.productId}", ex);
+            }       
 
-           
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri("https://serverlessohuser.trafficmanager.net");
+                    var result = await client.GetAsync($"/api/GetUser?userId={rating.userId}");
+                    string resultBody = await result.Content.ReadAsStringAsync();
+                    User user = JsonConvert.DeserializeObject<User>(resultBody);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Could not find user with id: {rating.userId}", ex);
+            }
 
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
+             // Add a property called id with a GUID value
+            rating.id = Guid.NewGuid().ToString();
 
-            return new OkObjectResult(responseMessage);
+            // Add a property called timestamp with the current UTC date time
+            rating.timeStamp = DateTime.UtcNow;
+
+            // Validate that the rating field is an integer from 0 to 5
+            if (rating.rating < 0 || rating.rating > 5)
+            {
+                throw new Exception("Rating must be between 0 and 5");
+            }
+
+            // Use a data service to store the ratings information to the backend
+            await ratingsOut.AddAsync(rating);
+
+            return new OkObjectResult(rating);
         }
     }
 }

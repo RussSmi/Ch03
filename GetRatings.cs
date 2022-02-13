@@ -1,40 +1,51 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Azure.Documents.Client;
 using Microsoft.AspNetCore.Mvc; 
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Microsoft.Azure.Documents.Linq;
+using System.Collections.Generic;
 
 namespace Serverless.Openhack
 {
-    public static class GetRatings
+    public class GetRatings
     {
         [FunctionName("GetRatings")]
-        public static async Task<IActionResult> Run(
+        public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
             [CosmosDB(
                 databaseName: "ch03db",
                 collectionName: "ch03collection",
-                ConnectionStringSetting = "CosmosDBConnection"
-            )] IAsyncCollector<Rating> ratingsOut,
+                ConnectionStringSetting = "CosmosDBConnectionString"
+            )] DocumentClient client,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            string name = req.Query["name"];
+            string userId = req.Query["userId"];
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            Uri collectionUri = UriFactory.CreateDocumentCollectionUri("ch03db", "ch03collection");
 
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
+            IDocumentQuery<Rating> query = client.CreateDocumentQuery<Rating>(collectionUri)
+                .Where(p => p.userId == userId)
+                .AsDocumentQuery();
 
-            return new OkObjectResult(responseMessage);
+            var listOfRatings = new List<Rating>();
+
+            while(query.HasMoreResults)
+            {
+                foreach(Rating result in await query.ExecuteNextAsync())
+                {
+                    listOfRatings.Add(result);
+                }
+            }
+            return new OkObjectResult(listOfRatings);
         }
     }
 }
