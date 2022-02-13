@@ -85,3 +85,5 @@ resource Function 'Microsoft.Web/sites@2021-01-15' = {
     }
   }
 }
+
+output storageEndpoint object = stg.properties.primaryEndpoints
