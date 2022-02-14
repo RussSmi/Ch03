@@ -14,7 +14,24 @@ POST https://sohch03-function-app.azurewebsites.net/api/CreateRating
 {
   "userId": "cc20a6fb-a91f-4192-874d-132493685376",
   "productId": "4c25613a-a3c2-4ef3-8e02-9c335eb23204",
-  "locationName": "Sample ice cream shop",
+  "locationName": "Gino's ice cream shop",
   "rating": 5,
-  "userNotes": "I love the subtle notes of orange in this ice cream!"
+  "userNotes": "I love the subtle notes of poop in this ice cream!"
 }
+
+###
+GET https://sohch03-function-app.azurewebsites.net/api/GetRating?ratingId=48977c9c-d7fa-447f-91c0-f3d9b979fa91
+
+###
+GET http://localhost:7071/api/rating/48977c9c-d7fa-447f-91c0-f3d9b979fa91
+
+### - working
+get http://localhost:7071/api/GetRatings?userId=cc20a6fb-a91f-4192-874d-132493685376
+
+
+### - no recors for user
+get http://localhost:7071/api/GetRatings?userId=cc20a6fb-a91f-4192-874d-13249368537a
+
+
+### bad request no user id
+get http://localhost:7071/api/GetRatings

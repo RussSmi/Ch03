@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
@@ -11,14 +12,13 @@ namespace Serverless.Openhack
     {
         [FunctionName("GetRating")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "rating/{id}")] HttpRequest req,
             [CosmosDB(
                 databaseName: "ch03db",
                 collectionName: "ch03collection",
                 ConnectionStringSetting = "CosmosDBConnectionString",
-                Id = "{Query.ratingId}",
-                PartitionKey = "{Query.userId}"
-            )] Rating ratingItem,
+                SqlQuery = "select * from c where c.id = {id}"
+            )] IEnumerable<Rating> ratingItem,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
@@ -27,12 +27,9 @@ namespace Serverless.Openhack
             {
                 log.LogInformation($"rating not found");
             }
-            else
-            {
-                log.LogInformation($"Found rating, id={ratingItem.id}");
-            }
-
+           
             return new OkObjectResult(ratingItem);
         }
     }
 }
+//            [CosmosDB("%RatingsDbName%", "%RatingsCollectionName%", ConnectionStringSetting = "RatingsDatabase", SqlQuery = "Select * from ratings r where r.id = {id}")]IEnumerable<RatingModel> rating,
