@@ -48,7 +48,12 @@ resource AppService 'Microsoft.Web/serverfarms@2021-01-15' = {
     name: 'Y1'
   }
 }
- 
+
+resource cosmosAccount 'Microsoft.DocumentDB/databaseAccounts@2021-03-15' existing = {
+ name: 'ch03cosmosacc'
+ scope: resourceGroup('rg-open-hack-serverless')
+}
+
 var FunctionName = '${prefix}-function-app'
  
 resource Function 'Microsoft.Web/sites@2021-01-15' = {
@@ -78,6 +83,12 @@ resource Function 'Microsoft.Web/sites@2021-01-15' = {
         {
           name: 'WEBSITE_CONTENTSHARE'
           value: '${toLower(FunctionName)}files'
+        }
+        {
+          name: 'CosmosDBConnectionString'
+          value: listConnectionStrings(resourceId('Microsoft.DocumentDB/databaseAccounts', 'ch03cosmosacc'), '2021-04-15').connectionStrings[0].connectionString
+          
+          //'AccountEndpoint=${cosmosAccount.properties.documentEndpoint};AccountKey=${cosmosAccount.listKeys().primaryMasterKey}'
         }
       ]
       use32BitWorkerProcess: false
