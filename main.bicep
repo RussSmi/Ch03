@@ -86,9 +86,10 @@ resource Function 'Microsoft.Web/sites@2021-01-15' = {
         }
         {
           name: 'CosmosDBConnectionString'
-          value: listConnectionStrings(resourceId('Microsoft.DocumentDB/databaseAccounts', 'ch03cosmosacc'), '2021-04-15').connectionStrings[0].connectionString
+          value: 'AccountEndpoint=${cosmosAccount.properties.documentEndpoint};AccountKey=${cosmosAccount.listKeys().primaryMasterKey}'
+          //cosmosAccount.listKeys().primaryMasterKey
+          //listConnectionStrings(resourceId('Microsoft.DocumentDB/databaseAccounts', 'ch03cosmosacc'), '2021-04-15').connectionStrings[0].connectionString
           
-          //'AccountEndpoint=${cosmosAccount.properties.documentEndpoint};AccountKey=${cosmosAccount.listKeys().primaryMasterKey}'
         }
       ]
       use32BitWorkerProcess: false
