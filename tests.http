@@ -20,7 +20,10 @@ POST https://sohch03-function-app.azurewebsites.net/api/CreateRating
 }
 
 ###
-GET https://sohch03-function-app.azurewebsites.net/api/GetRating?ratingId=48977c9c-d7fa-447f-91c0-f3d9b979fa91
+GET https://sohch03-function-app.azurewebsites.net/api/rating/f5059412-f6ff-4465-9176-c9fd2ad08202
+
+### - working
+get https://sohch03-function-app.azurewebsites.net/api/GetRatings?userId=cc20a6fb-a91f-4192-874d-132493685376
 
 ###
 GET http://localhost:7071/api/rating/48977c9c-d7fa-447f-91c0-f3d9b979fa91
