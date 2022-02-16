@@ -38,9 +38,9 @@ namespace Serverless.Openhack
                     Product product = JsonConvert.DeserializeObject<Product>(resultBody);
                 }
             }
-            catch (System.Exception ex)
+            catch (System.Exception)
             {
-                throw new Exception($"Could not find product with id: {rating.productId}", ex);
+                return new NotFoundObjectResult($"Could not find product with id: {rating.productId}");
             }       
 
             try
@@ -55,7 +55,7 @@ namespace Serverless.Openhack
             }
             catch (System.Exception ex)
             {
-                throw new Exception($"Could not find user with id: {rating.userId}", ex);
+                return new NotFoundObjectResult($"Could not find user with id: {rating.userId}");
             }
 
              // Add a property called id with a GUID value
@@ -67,7 +67,7 @@ namespace Serverless.Openhack
             // Validate that the rating field is an integer from 0 to 5
             if (rating.rating < 0 || rating.rating > 5)
             {
-                throw new Exception("Rating must be between 0 and 5");
+                return new BadRequestObjectResult("Bad request, Rating must be between 0 and 5 ");
             }
 
             // Use a data service to store the ratings information to the backend
