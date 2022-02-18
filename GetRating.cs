@@ -32,4 +32,3 @@ namespace Serverless.Openhack
         }
     }
 }
-//            [CosmosDB("%RatingsDbName%", "%RatingsCollectionName%", ConnectionStringSetting = "RatingsDatabase", SqlQuery = "Select * from ratings r where r.id = {id}")]IEnumerable<RatingModel> rating,
