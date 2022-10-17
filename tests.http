@@ -50,7 +50,7 @@ POST https://sohch03-function-app.azurewebsites.net/api/CreateRating
   "productId": "4c25613a-a3c2-4ef3-8e02-9c335eb23204",
   "locationName": "Gino's ice cream shop",
   "rating": 7,
-  "userNotes": "I love the subtle notes of garlic in this ice cream!"
+  "userNotes": "I love the subtle notes of salmon in this ice cream!"
 }
 
 ###
