@@ -1,4 +1,4 @@
-on: [push]
+on: [push,workflow_dispatch]
 env:
   AZURE_FUNCTIONAPP_NAME: sohch03-function-app  # set this to your application's name
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'    # set this to the path to your web app project, defaults to the repository root
